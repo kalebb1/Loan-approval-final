@@ -9,6 +9,9 @@ pipeline = joblib.load("loan_model_pipeline.pkl")
 
 from fastapi.staticfiles import StaticFiles
 
+# Initialize FastAPI app
+app = FastAPI()
+
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
@@ -26,7 +29,6 @@ class LoanApplication(BaseModel):
     luxury_assets_value: float
     bank_asset_value: float
 
-app = FastAPI()
 
 # Allow frontend (index.html) to call this API
 app.add_middleware(
