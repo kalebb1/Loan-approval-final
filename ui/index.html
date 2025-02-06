@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Approval Predictor</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            background-color: #f5f5f5; 
+            margin: 20px;
+        }
+        .container {
+            max-width: 450px; 
+            margin: auto; 
+            background: white; 
+            padding: 20px; 
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        h2 {
+            color: #333;
+        }
+        label { 
+            font-weight: bold; 
+            margin-top: 10px; 
+            display: block;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        button {
+            background-color: #007bff; 
+            color: white; 
+            padding: 10px; 
+            width: 100%;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Loan Approval Prediction</h2>
+
+        <form id="loanForm">
+            <label>No of Dependents:</label>
+            <input type="number" id="no_of_dependents" placeholder="e.g., 2" required>
+
+            <label>Education:</label>
+            <select id="education">
+                <option value="Graduate">Graduate</option>
+                <option value="Not Graduate">Not Graduate</option>
+            </select>
+
+            <label>Self Employed:</label>
+            <select id="self_employed">
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+            </select>
+
+            <label>Income Annum (Birr):</label>
+            <input type="number" id="income_annum" step="0.01" placeholder="e.g., 500000" required>
+
+            <label>Loan Amount (Birr):</label>
+            <input type="number" id="loan_amount" step="0.01" placeholder="e.g., 200000" required>
+
+            <label>Loan Term (Months):</label>
+            <input type="number" id="loan_term" placeholder="e.g., 360" required>
+
+            <label>CIBIL Score:</label>
+            <input type="number" id="cibil_score" step="0.01" placeholder="e.g., 750" required>
+
+            <label>Residential Assets Value (Birr):</label>
+            <input type="number" id="residential_assets_value" step="0.01" placeholder="e.g., 1000000" required>
+
+            <label>Commercial Assets Value (Birr):</label>
+            <input type="number" id="commercial_assets_value" step="0.01" placeholder="e.g., 500000" required>
+
+            <label>Luxury Assets Value (Birr):</label>
+            <input type="number" id="luxury_assets_value" step="0.01" placeholder="e.g., 200000" required>
+
+            <label>Bank Asset Value (Birr):</label>
+            <input type="number" id="bank_asset_value" step="0.01" placeholder="e.g., 300000" required>
+
+            <button type="button" onclick="predictLoan()">Predict Loan Status</button>
+        </form>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+function predictLoan() {
+    let no_of_dependents = parseInt(document.getElementById("no_of_dependents").value);
+    let education = document.getElementById("education").value;
+    let self_employed = document.getElementById("self_employed").value;
+    let income_annum = parseFloat(document.getElementById("income_annum").value) * 0.4; // Convert birr to NIR
+    let loan_amount = parseFloat(document.getElementById("loan_amount").value) * 0.4; 
+    let loan_term = parseFloat(document.getElementById("loan_term").value);
+    let cibil_score = parseFloat(document.getElementById("cibil_score").value);
+    let residential_assets_value = parseFloat(document.getElementById("residential_assets_value").value) * 0.4; 
+    let commercial_assets_value = parseFloat(document.getElementById("commercial_assets_value").value) * 0.4; 
+    let luxury_assets_value = parseFloat(document.getElementById("luxury_assets_value").value) * 0.4;  
+    let bank_asset_value = parseFloat(document.getElementById("bank_asset_value").value) * 0.4; 
+
+    let requestData = {
+        no_of_dependents: no_of_dependents,
+        education: education,
+        self_employed: self_employed,
+        income_annum: income_annum,
+        loan_amount: loan_amount,
+        loan_term: loan_term,
+        cibil_score: cibil_score,
+        residential_assets_value: residential_assets_value,
+        commercial_assets_value: commercial_assets_value,
+        luxury_assets_value: luxury_assets_value,
+        bank_asset_value: bank_asset_value
+    };
+
+    fetch("http://127.0.0.1:8000/predict", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(requestData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById("result").innerHTML = "Loan Status: " + data.loan_status;
+    })
+    .catch(error => console.error("Error:", error));
+}
+
+    </script>
+
+</body>
+</html>
