@@ -1,11 +1,12 @@
 from fastapi import FastAPI
-import os
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+from fastapi.requests import Request
 import joblib
 import pandas as pd
 from pydantic import BaseModel
-
+import os
 
 # Load the entire pipeline (preprocessor + model)
 pipeline = joblib.load("loan_model_pipeline.pkl")  # Load the saved pipeline
@@ -14,13 +15,15 @@ pipeline = joblib.load("loan_model_pipeline.pkl")  # Load the saved pipeline
 app = FastAPI()
 
 # Mount the "static" folder (for CSS/JS)
-app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
-# app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# Load HTML templates
+templates = Jinja2Templates(directory="templates")
 
 # Serve the HTML file when accessing the root URL
-@app.get("/")
-def serve_homepage():
-    return FileResponse("/stat")  # Serve the UI
+@app.get("/", response_class=HTMLResponse)
+def serve_homepage(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 # Define expected input structure
 class LoanApplication(BaseModel):
