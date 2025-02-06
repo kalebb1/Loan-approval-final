@@ -1,19 +1,24 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 import joblib
 import pandas as pd
 from pydantic import BaseModel
-from fastapi.middleware.cors import CORSMiddleware
+import os
 
-# Load the trained model pipeline
-pipeline = joblib.load("loan_model_pipeline.pkl")
-
-from fastapi.staticfiles import StaticFiles
+# Load the entire pipeline (preprocessor + model)
+pipeline = joblib.load("loan_model_pipeline.pkl")  # Load the saved pipeline
 
 # Initialize FastAPI app
 app = FastAPI()
 
+# Mount the "static" folder (for CSS/JS)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+# Serve the HTML file when accessing the root URL
+@app.get("/")
+def serve_homepage():
+    return FileResponse("index.html")  # Serve the UI
 
 # Define expected input structure
 class LoanApplication(BaseModel):
@@ -28,19 +33,6 @@ class LoanApplication(BaseModel):
     commercial_assets_value: float
     luxury_assets_value: float
     bank_asset_value: float
-
-
-# Allow frontend (index.html) to call this API
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-@app.get("/")  # <-- Add this root route
-def home():
-    return {"message": "Loan Prediction API is running!"}
 
 @app.post("/predict")
 def predict_loan_status(data: LoanApplication):
