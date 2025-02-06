@@ -18,7 +18,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # Serve the HTML file when accessing the root URL
 @app.get("/")
 def serve_homepage():
-    return FileResponse("index.html")  # Serve the UI
+    return FileResponse("/stat")  # Serve the UI
 
 # Define expected input structure
 class LoanApplication(BaseModel):

@@ -114,17 +114,17 @@
 
     <script>
 function predictLoan() {
-    let no_of_dependents = parseInt(document.getElementById("no_of_dependents").value);
+    let no_of_dependents = parseInt(document.getElementById("no_of_dependents").value) || 0;
     let education = document.getElementById("education").value;
     let self_employed = document.getElementById("self_employed").value;
-    let income_annum = parseFloat(document.getElementById("income_annum").value) * 0.4; // Convert birr to NIR
-    let loan_amount = parseFloat(document.getElementById("loan_amount").value) * 0.4; 
-    let loan_term = parseFloat(document.getElementById("loan_term").value);
-    let cibil_score = parseFloat(document.getElementById("cibil_score").value);
-    let residential_assets_value = parseFloat(document.getElementById("residential_assets_value").value) * 0.4; 
-    let commercial_assets_value = parseFloat(document.getElementById("commercial_assets_value").value) * 0.4; 
-    let luxury_assets_value = parseFloat(document.getElementById("luxury_assets_value").value) * 0.4;  
-    let bank_asset_value = parseFloat(document.getElementById("bank_asset_value").value) * 0.4; 
+    let income_annum = parseFloat(document.getElementById("income_annum").value) * 0.4 || 0;
+    let loan_amount = parseFloat(document.getElementById("loan_amount").value) * 0.4 || 0;
+    let loan_term = parseFloat(document.getElementById("loan_term").value) || 0;
+    let cibil_score = parseFloat(document.getElementById("cibil_score").value) || 0;
+    let residential_assets_value = parseFloat(document.getElementById("residential_assets_value").value) * 0.4 || 0;
+    let commercial_assets_value = parseFloat(document.getElementById("commercial_assets_value").value) * 0.4 || 0;
+    let luxury_assets_value = parseFloat(document.getElementById("luxury_assets_value").value) * 0.4 || 0;
+    let bank_asset_value = parseFloat(document.getElementById("bank_asset_value").value) * 0.4 || 0;
 
     let requestData = {
         no_of_dependents: no_of_dependents,
@@ -140,7 +140,9 @@ function predictLoan() {
         bank_asset_value: bank_asset_value
     };
 
-    fetch("http://127.0.0.1:8000/predict", {
+    let apiUrl = window.location.origin + "/predict"; // Auto-detects the correct domain
+
+    fetch(apiUrl, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -149,11 +151,13 @@ function predictLoan() {
     })
     .then(response => response.json())
     .then(data => {
-        document.getElementById("result").innerHTML = "Loan Status: " + data.loan_status;
+        document.getElementById("result").innerHTML = "Loan Status: " + (data.loan_status ? "Approved" : "Rejected");
     })
-    .catch(error => console.error("Error:", error));
+    .catch(error => {
+        console.error("Error:", error);
+        document.getElementById("result").innerHTML = "Error predicting loan status. Please try again.";
+    });
 }
-
     </script>
 
 </body>
